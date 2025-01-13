@@ -1,0 +1,33 @@
+{
+    "name": "desafio/user",
+    "description": "Modulo para gerenciamento de usuarios",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Desafio\\User\\": "src/",
+            "Desafio\\User\\Seeders\\": "database/seeders/"
+        }
+    },
+    "require": {
+        "php": "^8.2",
+        "laravel/framework": "^11.31"
+    },
+    "autoload-dev": {},
+    "authors": [
+        {
+            "name": "Vitor Guedes",
+            "email": "vtrf2.0@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "version": "1.0.0",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Desafio\\User\\Providers\\UserServiceProvider"
+            ]
+        }
+    }
+}
