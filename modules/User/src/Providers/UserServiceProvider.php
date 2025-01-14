@@ -12,11 +12,13 @@ class UserServiceProvider extends ServiceProvider
     {
         $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
 
+        $this->loadRoutesFrom(__DIR__ . '/../Routes/api.php');
+
         User::observe(UserObserver::class);
     }
 
     public function register()
     {
-
+        $this->replaceConfigRecursivelyFrom(__DIR__ . '/../Config/auth.php', 'auth');
     }
 }
