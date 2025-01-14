@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('user_accounts', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->decimal('amount', 10, 2)->default(0);
+            $table->bigInteger('amount')->default(0);
             $table->enum('type', [1, 2])->default(1);
             $table->foreign('user_id')->references('id')->on('users');
         });

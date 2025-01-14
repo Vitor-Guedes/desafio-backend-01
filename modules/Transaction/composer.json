@@ -1,0 +1,33 @@
+{
+    "name": "desafio/transaction",
+    "description": "Modulo para gerenciamento de transação de usuarios",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Desafio\\Transaction\\": "src/",
+            "Desafio\\Transaction\\Seeders\\": "database/seeders/"
+        }
+    },
+    "require": {
+        "php": "^8.2",
+        "laravel/framework": "^11.31"
+    },
+    "autoload-dev": {},
+    "authors": [
+        {
+            "name": "Vitor Guedes",
+            "email": "vtrf2.0@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "version": "1.0.0",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Desafio\\Transaction\\Providers\\TransactionServiceProvider"
+            ]
+        }
+    }
+}
