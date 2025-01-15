@@ -11,7 +11,7 @@ class Notify
      */
     public function canNotify(): bool
     {
-        $response = Http::get(config('external-service.urls.notify'));
+        $response = Http::post(config('external-service.urls.notify'));
         return $response->successful() 
             ? $response->json('data.authorization', false) 
                 : false;
