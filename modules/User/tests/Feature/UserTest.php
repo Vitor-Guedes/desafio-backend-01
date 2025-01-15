@@ -93,7 +93,7 @@ class UserTest extends TestCase
         ]);
     }
 
-    public function test_must_be_able_to_transfer_if_the_external_service_allows()
+    public function test_must_prevent_the_user_from_being_able_to_transfer_the_value_to_himself()
     {
         $user = User::whereHas('account', function ($builder) {
             $builder->where('type', Account::TYPE_NORMAL);
@@ -102,10 +102,49 @@ class UserTest extends TestCase
         $user->account->amount = rand(10000, 20000);
         $user->account->save();
 
-        $destiny = User::where('id', '<>', $user->id)->inRandomOrder()->first();
+        $destiny = $user;
 
         $payload = [
             "value" => 100.0,
+            "payer" => $user->id,
+            "payee" => $destiny->id
+        ];
+
+        $response = $this->postJson(route('api.transfer'), $payload);
+
+        $response->assertStatus(200);
+        $this->assertEquals(false, $response->json('success'));
+        $this->assertEquals(__('transaction::app.transfer.fail.invalid_payee'), $response->json('message'));
+        $this->assertDatabaseHas('user_accounts', [
+            'user_id' => $user->id,
+            'amount' => $user->account->amount
+        ]);
+        $this->assertDatabaseHas('user_accounts', [
+            'user_id' => $destiny->id,
+            'amount' => $destiny->account->amount
+        ]);
+        $this->assertDatabaseHas('transactions', [
+            'status' => 'fail',
+            'payer' => $user->id,
+            'payee' => $destiny->id,
+            'type' => 'transfer'
+        ]);
+    }
+
+    public function test_must_be_able_to_transfer_if_the_external_service_allows()
+    {
+        $user = User::whereHas('account', function ($builder) {
+            $builder->where('type', Account::TYPE_NORMAL);
+        })->inRandomOrder()->first();
+
+        $amount = rand(10000, 20000);
+        $user->account->amount = $amount;
+        $user->account->save();
+
+        $destiny = User::where('id', '<>', $user->id)->inRandomOrder()->first();
+
+        $payload = [
+            "value" => 100.00,
             "payer" => $user->id,
             "payee" => $destiny->id
         ];
@@ -120,11 +159,11 @@ class UserTest extends TestCase
             $this->assertEquals(__('transaction::app.transfer.success'), $response->json('message'));
             $this->assertDatabaseHas('user_accounts', [
                 'user_id' => $user->id,
-                'amount' => $user->account->amount - 100
+                'amount' => $amount - (100 * 100)
             ]);
             $this->assertDatabaseHas('user_accounts', [
                 'user_id' => $destiny->id,
-                'amount' => $destiny->account->amount + 100
+                'amount' => 100 * 100
             ]);
             $this->assertDatabaseHas('transactions', [
                 'status' => 'success',

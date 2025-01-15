@@ -31,31 +31,20 @@ class Transfer
         $this->payer = User::findOrFail($from);
         $this->payee = User::findOrFail($to);
 
+        if (! $this->isValidPayee()) {
+            return $this->registerFail(__('transaction::app.transfer.fail.invalid_payee'), $value);
+        }
+
         if (! $this->hasAmount($value)) {
-            $this->register([
-                'amount' => $this->convertToCent($value),
-                'status' => 'fail'
-            ]);
-            $this->message = __('transaction::app.transfer.fail.insufficient_amount');
-            return $this;
+            return $this->registerFail(__('transaction::app.transfer.fail.insufficient_amount'), $value);
         }
 
         if (! $this->typeAccountCanTransfer()) {
-            $this->register([
-                'amount' => $this->convertToCent($value),
-                'status' => 'fail'
-            ]);
-            $this->message = __('transaction::app.transfer.fail.account_type.shopkeeper');
-            return $this;
+            return $this->registerFail(__('transaction::app.transfer.fail.account_type.shopkeeper'), $value);
         }
 
         if (! $this->canTransfer()) {
-            $this->register([
-                'amount' => $this->convertToCent($value),
-                'status' => 'fail'
-            ]);
-            $this->message = __('transaction::app.transfer.fail.external_service');
-            return $this;
+            $this->registerFail(__('transaction::app.transfer.fail.external_service'), $value);
         }
 
         $this->decrement($this->payer, $value);
@@ -90,10 +79,18 @@ class Transfer
     /**
      * @return bool
      */
-    public function canTransfer(): bool
+    protected function canTransfer(): bool
     {
         $response = Http::get($this->externalService);
         return $response->successful() ? $response->json('data.authorization', false) : false;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isValidPayee(): bool
+    {
+        return $this->payer->id !== $this->payee->id;
     }
 
     /**
@@ -109,6 +106,22 @@ class Transfer
             'type' => 'transfer'
         ], $attributes);
         $this->transaction = Transaction::create($data);
+    }
+
+    /**
+     * @param string $message
+     * @param float $amount
+     * 
+     * @return self
+     */
+    public function registerFail(string $message, float $amount): self
+    {
+        $this->register([
+            'amount' => $this->convertToCent($amount),
+            'status' => 'fail'
+        ]);
+        $this->message = $message;
+        return $this;
     }
 
     /**
