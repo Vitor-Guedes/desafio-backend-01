@@ -19,18 +19,18 @@ jobs:
 
             - name: Install Dependences  Composer
               run: |
-                docker exec -it -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 docker-php-fpm-1 composer install
-                docker exec -it -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 docker-php-fpm-1 composer dumpautoload -o
+                docker exec -t -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 docker-php-fpm-1 composer install
+                docker exec -t -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 docker-php-fpm-1 composer dumpautoload -o
             
             - name: Clear Caches
               run: | 
-                docker exec -it -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 docker-php-fpm-1 php artisan optimize:clear
-                docker exec -it -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 docker-php-fpm-1 php artisan optimize
+                docker exec -t -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 docker-php-fpm-1 php artisan optimize:clear
+                docker exec -t -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 docker-php-fpm-1 php artisan optimize
             
             - name: Testes (.env.testing)
-              run: docker exec -it -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 docker-php-fpm-1 php artisan test --env="testing"
+              run: docker exec -t -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 docker-php-fpm-1 php artisan test --env="testing"
 
             - name: Clear Caches
               run: |
-                docker exec -it -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 docker-php-fpm-1 php artisan optimize:clear
-                docker exec -it -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 docker-php-fpm-1 php artisan optimize
+                docker exec -t -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 docker-php-fpm-1 php artisan optimize:clear
+                docker exec -t -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 docker-php-fpm-1 php artisan optimize
