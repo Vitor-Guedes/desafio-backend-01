@@ -21,15 +21,18 @@ jobs:
 
             - name: Install Dependences  Composer
               run: |
-                cd actions-runner/_work/desafio-backend-01/desafio-backend-01/
-                composer install
-                composer dumpautoload -o
+                docker exec -it -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 composer install
+                docker exec -it -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 composer dumpautoload -o
             
             - name: Clear Caches
-              run: php artisan optimize:clear; php artisan optimize
+              run: | 
+                docker exec -it -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 php artisan optimize:clear
+                docker exec -it -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 php artisan optimize
             
             - name: Testes (.env.testing)
-              run: php artisan test --env="testing"
+              run: docker exec -it -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 php artisan test --env="testing"
 
             - name: Clear Caches
-              run: php artisan optimize:clear; php artisan optimize
+              run: |
+                docker exec -it -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 php artisan optimize:clear
+                docker exec -it -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 php artisan optimize
