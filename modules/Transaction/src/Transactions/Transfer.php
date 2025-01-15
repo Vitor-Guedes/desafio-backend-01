@@ -2,10 +2,13 @@
 
 namespace Desafio\Transaction\Transactions;
 
+use Exception;
 use Desafio\User\Models\User;
 use Desafio\User\Models\Account;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Desafio\Transaction\Models\Transaction;
+use Desafio\Transaction\Notifications\TransferReceive;
 
 class Transfer
 {
@@ -19,6 +22,8 @@ class Transfer
 
     protected $externalService = 'https://util.devi.tools/api/v2/authorize';
 
+    protected $externalServiceNotify = 'https://util.devi.tools/api/v1/notify';
+
     /**
      * @param float $value
      * @param int $from
@@ -28,34 +33,47 @@ class Transfer
      */
     public function make(float $value, int $from, int $to)
     {
-        $this->payer = User::findOrFail($from);
-        $this->payee = User::findOrFail($to);
+        try {
+            DB::beginTransaction();
 
-        if (! $this->isValidPayee()) {
-            return $this->registerFail(__('transaction::app.transfer.fail.invalid_payee'), $value);
+            $this->payer = User::findOrFail($from);
+            $this->payee = User::findOrFail($to);
+
+            if (! $this->isValidPayee()) {
+                return $this->registerFail(__('transaction::app.transfer.fail.invalid_payee'), $value);
+            }
+
+            if (! $this->hasAmount($value)) {
+                return $this->registerFail(__('transaction::app.transfer.fail.insufficient_amount'), $value);
+            }
+
+            if (! $this->typeAccountCanTransfer()) {
+                return $this->registerFail(__('transaction::app.transfer.fail.account_type.shopkeeper'), $value);
+            }
+
+            if (! $this->canTransfer()) {
+                $this->registerFail(__('transaction::app.transfer.fail.external_service'), $value);
+            }
+
+            $this->decrement($this->payer, $value);
+            $this->increment($this->payee, $value);
+
+            $this->register([
+                'amount' => $this->convertToCent($value),
+                'status' => 'success'
+            ]);
+            $this->message = __('transaction::app.transfer.success');
+
+            $this->notify();
+
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            $this->message = $e->getMessage();
+        } finally {
+            return $this;
         }
-
-        if (! $this->hasAmount($value)) {
-            return $this->registerFail(__('transaction::app.transfer.fail.insufficient_amount'), $value);
-        }
-
-        if (! $this->typeAccountCanTransfer()) {
-            return $this->registerFail(__('transaction::app.transfer.fail.account_type.shopkeeper'), $value);
-        }
-
-        if (! $this->canTransfer()) {
-            $this->registerFail(__('transaction::app.transfer.fail.external_service'), $value);
-        }
-
-        $this->decrement($this->payer, $value);
-        $this->increment($this->payee, $value);
-
-        $this->register([
-            'amount' => $this->convertToCent($value),
-            'status' => 'success'
-        ]);
-        $this->message = __('transaction::app.transfer.success');
-        return $this;
     }
 
     /**
@@ -186,5 +204,17 @@ class Transfer
     protected function convertToCent(float $amount): int
     {
         return (int) ($amount * 100);
+    }
+
+    /**
+     * @return void
+     */
+    protected function notify(): void
+    {
+        $response = Http::post($this->externalServiceNotify);
+        if (! $response->successful()) {
+            return ;
+        }
+        $this->payer->notify(new TransferReceive($this->transaction));
     }
 }
