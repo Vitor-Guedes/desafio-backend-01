@@ -13,8 +13,6 @@ jobs:
     build:
         runs-on:
             - desafio-label
-        
-        container: docker-php-fpm-1
 
         steps:
             - uses: actions/checkout@v4
