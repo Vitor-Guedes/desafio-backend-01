@@ -13,11 +13,17 @@ jobs:
     build:
         runs-on:
             - desafio-label
+        
+        container: docker-php-fpm-1
+
         steps:
             - uses: actions/checkout@v4
 
             - name: Install Dependences  Composer
-              run: composer install; composer dumpautoload -o;
+              run: |
+                cd actions-runner/_work/desafio-backend-01/desafio-backend-01/
+                composer install
+                composer dumpautoload -o
             
             - name: Clear Caches
               run: php artisan optimize:clear; php artisan optimize
