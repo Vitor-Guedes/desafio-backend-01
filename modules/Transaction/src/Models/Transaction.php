@@ -11,6 +11,7 @@ class Transaction extends Model
         'payer',
         'payee',
         'amount',
-        'status'
+        'status',
+        'reason'
     ];
 }

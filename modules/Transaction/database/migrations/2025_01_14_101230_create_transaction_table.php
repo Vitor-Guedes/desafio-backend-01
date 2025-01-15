@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('payee');
             $table->bigInteger('amount')->nullable(false);
             $table->enum('status', ['fail', 'success']);
+            $table->string('reason', 150)->nullable(true);
             $table->timestamps();
         });
     }
