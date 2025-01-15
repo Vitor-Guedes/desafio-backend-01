@@ -2,12 +2,12 @@
 
 namespace Desafio\User\Models;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Support\Facades\Hash;
 
-class User extends Model
+class User extends Authenticatable
 {
     protected $fillable = [
         'name',
@@ -18,24 +18,37 @@ class User extends Model
 
     public $timestamps = false;
 
+    protected $hidden = [
+        'password'
+    ];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
     public function account(): HasOne
     {
         return $this->hasOne(Account::class);
     }
 
-    protected function password(): Attribute
-    {
-        return Attribute::make(
-            get: fn (string $value) => $value,
-            set: fn (string $value) => Hash::make($value)
-        );
-    }
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
     protected function cpfCnpj(): Attribute
     {
         return Attribute::make(
             get: fn (string $value) => $value,
             set: fn (string $value) => $this->justNumbers($value)
+        );
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function password(): Attribute
+    {
+        return Attribute::make(
+            get: fn (string $value) => $value,
+            set: fn (string $value) => Hash::make($value)
         );
     }
 
