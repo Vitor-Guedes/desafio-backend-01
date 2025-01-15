@@ -16,12 +16,17 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
-            - name: Run a one-line script
-              run: |
-                    echo hello, world!
-                    sleep 10
-                    echo Goodbye
+            - name: Install Dependences  Composer
+              run: composer install
+              run: composer dumpautoload -o
             
-            - name: Run a multi-line script
-              run: |
-                echo "${{ github.workspace }}"
+            - name: Clear Caches
+              run: php artisan optimize:clear
+              run: php artisan optimize
+            
+            - name: Testes (.env.testing)
+              run: php artisan test --env="testing"
+
+            - name: Clear Caches
+              run: php artisan optimize:clear
+              run: php artisan optimize
