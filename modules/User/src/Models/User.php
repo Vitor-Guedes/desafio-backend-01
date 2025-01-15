@@ -5,10 +5,13 @@ namespace Desafio\User\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 
 class User extends Authenticatable
 {
+    use Notifiable;
+
     protected $fillable = [
         'name',
         'cpf_cnpj',

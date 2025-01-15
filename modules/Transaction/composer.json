@@ -7,7 +7,10 @@
         "psr-4": {
             "Desafio\\Transaction\\": "src/",
             "Desafio\\Transaction\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "src/helper.php"
+        ]
     },
     "require": {
         "php": "^8.2",
