@@ -17,16 +17,13 @@ jobs:
             - uses: actions/checkout@v4
 
             - name: Install Dependences  Composer
-              run: composer install
-              run: composer dumpautoload -o
+              run: composer install; composer dumpautoload -o;
             
             - name: Clear Caches
-              run: php artisan optimize:clear
-              run: php artisan optimize
+              run: php artisan optimize:clear; php artisan optimize
             
             - name: Testes (.env.testing)
               run: php artisan test --env="testing"
 
             - name: Clear Caches
-              run: php artisan optimize:clear
-              run: php artisan optimize
+              run: php artisan optimize:clear; php artisan optimize
