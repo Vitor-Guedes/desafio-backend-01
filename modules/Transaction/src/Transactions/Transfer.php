@@ -20,10 +20,6 @@ class Transfer
 
     protected $transaction;
 
-    protected $externalService = 'https://util.devi.tools/api/v2/authorize';
-
-    protected $externalServiceNotify = 'https://util.devi.tools/api/v1/notify';
-
     /**
      * @param float $value
      * @param int $from
@@ -99,7 +95,7 @@ class Transfer
      */
     protected function canTransfer(): bool
     {
-        $response = Http::get($this->externalService);
+        $response = Http::get(config('external-service.urls.authorize'));
         return $response->successful() ? $response->json('data.authorization', false) : false;
     }
 
@@ -211,7 +207,7 @@ class Transfer
      */
     protected function notify(): void
     {
-        $response = Http::post($this->externalServiceNotify);
+        $response = Http::post(config('external-service.urls.notify'));
         if (! $response->successful()) {
             return ;
         }

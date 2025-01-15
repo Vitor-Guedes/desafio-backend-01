@@ -13,6 +13,6 @@ class TransactionServiceProvider extends ServiceProvider
 
     public function register()
     {
-        
+        $this->mergeConfigFrom(__DIR__ . '/../Config/external-service.php', 'external-service');
     }
 }
