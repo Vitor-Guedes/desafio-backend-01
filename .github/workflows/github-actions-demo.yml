@@ -22,11 +22,11 @@ jobs:
                 docker exec -t -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 docker-php-fpm-1 composer install
                 docker exec -t -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 docker-php-fpm-1 composer dumpautoload -o
 
-            - name: Copy .env.example
-                run: docker exec -t -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 docker-php-fpm-1 cp .env.example .env
+            - name: Copy Env
+              run: docker exec -t -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 docker-php-fpm-1 cp .env.example .env
 
             - name: Running Migrations
-                run: docker exec -t -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 docker-php-fpm-1 php artisan migrate
+              run: docker exec -t -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 docker-php-fpm-1 php artisan migrate
             
             - name: Clear Caches
               run: | 
