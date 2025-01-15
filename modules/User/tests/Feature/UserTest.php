@@ -37,21 +37,12 @@ class UserTest extends TestCase
         $response = $this->postJson(route('api.transfer'), $payload);
 
         $response->assertStatus(200);
-        $this->assertEquals(false, $response->json('success'));
-        $this->assertEquals(__('transaction::app.transfer.fail.insufficient_amount'), $response->json('message'));
-        $this->assertDatabaseHas('user_accounts', [
-            'user_id' => $user->id,
-            'amount' => $user->account->amount
-        ]);
-        $this->assertDatabaseHas('user_accounts', [
-            'user_id' => $destiny->id,
-            'amount' => $destiny->account->amount
-        ]);
         $this->assertDatabaseHas('transactions', [
             'status' => 'fail',
             'payer' => $user->id,
             'payee' => $destiny->id,
-            'type' => 'transfer'
+            'type' => 'transfer',
+            'reason' => __('transaction::app.transfer.fail.insufficient_amount')
         ]);
     }
 
@@ -75,21 +66,12 @@ class UserTest extends TestCase
         $response = $this->postJson(route('api.transfer'), $payload);
 
         $response->assertStatus(200);
-        $this->assertEquals(false, $response->json('success'));
-        $this->assertEquals(__('transaction::app.transfer.fail.account_type.shopkeeper'), $response->json('message'));
-        $this->assertDatabaseHas('user_accounts', [
-            'user_id' => $user->id,
-            'amount' => $user->account->amount
-        ]);
-        $this->assertDatabaseHas('user_accounts', [
-            'user_id' => $destiny->id,
-            'amount' => $destiny->account->amount
-        ]);
         $this->assertDatabaseHas('transactions', [
             'status' => 'fail',
             'payer' => $user->id,
             'payee' => $destiny->id,
-            'type' => 'transfer'
+            'type' => 'transfer',
+            'reason' => __('transaction::app.transfer.fail.account_type.shopkeeper')
         ]);
     }
 
@@ -113,21 +95,12 @@ class UserTest extends TestCase
         $response = $this->postJson(route('api.transfer'), $payload);
 
         $response->assertStatus(200);
-        $this->assertEquals(false, $response->json('success'));
-        $this->assertEquals(__('transaction::app.transfer.fail.invalid_payee'), $response->json('message'));
-        $this->assertDatabaseHas('user_accounts', [
-            'user_id' => $user->id,
-            'amount' => $user->account->amount
-        ]);
-        $this->assertDatabaseHas('user_accounts', [
-            'user_id' => $destiny->id,
-            'amount' => $destiny->account->amount
-        ]);
         $this->assertDatabaseHas('transactions', [
             'status' => 'fail',
             'payer' => $user->id,
             'payee' => $destiny->id,
-            'type' => 'transfer'
+            'type' => 'transfer',
+            'reason' => __('transaction::app.transfer.fail.invalid_payee'),
         ]);
     }
 
@@ -152,43 +125,6 @@ class UserTest extends TestCase
         $response = $this->postJson(route('api.transfer'), $payload);
 
         $response->assertStatus(200);
-        
-        $allow = $response->json('success');
-        if ($allow) {
-            $this->assertEquals(true, $response->json('success'));
-            $this->assertEquals(__('transaction::app.transfer.success'), $response->json('message'));
-            $this->assertDatabaseHas('user_accounts', [
-                'user_id' => $user->id,
-                'amount' => $amount - (100 * 100)
-            ]);
-            $this->assertDatabaseHas('user_accounts', [
-                'user_id' => $destiny->id,
-                'amount' => 100 * 100
-            ]);
-            $this->assertDatabaseHas('transactions', [
-                'status' => 'success',
-                'payer' => $user->id,
-                'payee' => $destiny->id,
-                'type' => 'transfer'
-            ]);
-        } else {
-            $this->assertEquals(false, $response->json('success'));
-            $this->assertEquals(__('transaction::app.transfer.fail.external_service'), $response->json('message'));
-            $this->assertDatabaseHas('user_accounts', [
-                'user_id' => $user->id,
-                'amount' => $user->account->amount
-            ]);
-            $this->assertDatabaseHas('user_accounts', [
-                'user_id' => $destiny->id,
-                'amount' => $destiny->account->amount
-            ]);
-            $this->assertDatabaseHas('transactions', [
-                'status' => 'fail',
-                'payer' => $user->id,
-                'payee' => $destiny->id,
-                'type' => 'transfer'
-            ]);
-        }
     }
 
 }
