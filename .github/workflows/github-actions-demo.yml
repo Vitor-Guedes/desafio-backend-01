@@ -1,8 +1,8 @@
 name: Desafio-workflow
 
 on:
-    push:
-        branches: [ cicd-learning ]
+    # push:
+    #     branches: [ cicd-learning ]
 
     pull_request:
         branches: [ master ]
@@ -23,7 +23,7 @@ jobs:
                 docker exec -t -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 docker-php-fpm-1 composer dumpautoload -o
 
             - name: Copy Env
-              run: docker exec -t -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 docker-php-fpm-1 cp .env.example .env
+              run: docker exec -t -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 docker-php-fpm-1 php -r "file_exists('.env') || copy('.env.example', '.env');"
 
             - name: Running Migrations
               run: docker exec -t -w /projects/actions-runner/_work/desafio-backend-01/desafio-backend-01 docker-php-fpm-1 php artisan migrate
